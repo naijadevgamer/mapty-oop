@@ -22,7 +22,7 @@ class Workout {
   }
 }
 class Running extends Workout {
-  type = 'cycling';
+  type = 'running';
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.candence = cadence;
@@ -159,6 +159,7 @@ class App {
   }
 
   renderWorkoutMarker(workout) {
+    console.log(workout);
     L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
