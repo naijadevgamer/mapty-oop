@@ -16,17 +16,12 @@ class App {
   #mapEvent;
 
   constructor() {
+    // Get user's position
     this._getPosition();
 
     form.addEventListener('submit', this._newWorkout.bind(this));
-
     // Toggle to elevation or cadence on input type change
-    inputType.addEventListener('change', function () {
-      inputElevation
-        .closest('.form__row')
-        .classList.toggle('form__row--hidden');
-      inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
-    });
+    inputType.addEventListener('change', this._toggleElevationField());
   }
 
   _getPosition() {
@@ -61,7 +56,11 @@ class App {
     inputDistance.focus();
   }
 
-  _toggleElevationField() {}
+  _toggleElevationField() {
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+    inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+  }
+
   _newWorkout(e) {
     e.preventDefault();
 
@@ -69,9 +68,10 @@ class App {
     inputDistance.value = inputDuration.value = inputCadence.value = '';
 
     // Display marker
-    const { lat, lng } = mapEvent.latlng;
+    const { lat, lng } = this.#mapEvent.latlng;
+    console.log(lat, lng);
     L.marker([lat, lng])
-      .addTo(map)
+      .addTo(this.#map)
       .bindPopup(
         L.popup({
           maxWidth: 250,
