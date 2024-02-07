@@ -38,3 +38,27 @@ if (navigator.geolocation)
       alert('Could not get your position');
     }
   );
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  // Clear input fields
+  inputDistance.value = inputDuration.value = inputCadence.value = '';
+
+  // Display marker
+  console.log(mapEvent);
+  const { lat, lng } = mapEvent.latlng;
+  L.marker([lat, lng])
+    .addTo(map)
+    .bindPopup(
+      L.popup({
+        maxWidth: 250,
+        minWidth: 100,
+        autoClose: false,
+        closeOnClick: false,
+        className: 'running-popup',
+      })
+    )
+    .setPopupContent('Running')
+    .openPopup();
+});
