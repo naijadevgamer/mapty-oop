@@ -59,11 +59,6 @@ class Cycling extends Workout {
   }
 }
 
-const run1 = new Running([6.1, 5.2], 5.2, 24, 178);
-const cycling1 = new Cycling([6.1, 5.2], 5.2, 24, 45);
-
-console.log(run1, cycling1);
-
 class App {
   #map;
   #mapEvent;
@@ -72,11 +67,12 @@ class App {
   constructor() {
     // Get user's position
     this._getPosition();
-    this._getLocalStorage();
-    this._renderStorage();
 
+    // Get and store workouts from local storage
+    this._getLocalStorage();
+
+    // Event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
-    // Toggle to elevation or cadence on input type change
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
@@ -90,22 +86,9 @@ class App {
         }
       );
   }
-  _getLocalStorage() {
-    return JSON.parse(localStorage.workouts) || [];
-  }
 
-  _renderStorage() {
-    this._getLocalStorage().forEach(workout => {
-      // Render workout on map as marker
-      this._renderWorkoutMarker(workout);
-      // Render workout on the list
-      this._renderWorkout(workout);
-    });
-  }
   _loadMap(position) {
     const { latitude, longitude } = position.coords;
-    console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
-
     const coords = [latitude, longitude];
     this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
@@ -116,6 +99,9 @@ class App {
 
     // Handling clicks on map
     this.#map.on('click', this._showForm.bind(this));
+    this.#workouts.forEach(workout => {
+      this._renderWorkoutMarker(workout);
+    });
   }
 
   _showForm(e) {
@@ -196,7 +182,6 @@ class App {
   }
 
   _renderWorkoutMarker(workout) {
-    console.log(workout);
     L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
@@ -242,7 +227,6 @@ class App {
             <span class="workout__value">${workout.cadence.toFixed(1)}</span>
             <span class="workout__unit">spm</span>
           </div>`;
-    console.log(workout.cadence);
     if (workout.type === 'cycling')
       html += `<div class="workout__details">
             <span class="workout__icon">⚡️</span>
@@ -272,6 +256,17 @@ class App {
   }
   _setLocalStorage() {
     localStorage.workouts = JSON.stringify(this.#workouts);
+  }
+  _getLocalStorage() {
+    if (!localStorage.workouts) return;
+    this.#workouts = JSON.parse(localStorage.workouts);
+    this.#workouts.forEach(workout => {
+      this._renderWorkout(workout);
+    });
+  }
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
   }
 }
 
